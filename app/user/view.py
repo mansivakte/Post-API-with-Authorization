@@ -11,11 +11,15 @@ user_blueprint = Blueprint('user_blueprint', __name__)
 @user_blueprint.route('/register', methods= ['POST'])
 def register():
     payload = request.json
-    user_password = generate_password_hash(payload['password'])
-    user = User(email = payload['email'], password = user_password)
-    db.session.add(user)
-    db.session.commit()
-    return {'status':'Registered Successfully'}
+    user = User.query.filter_by(email = payload['email']).first()
+    if user:
+        return {'Message': 'email id already registered'}
+    else:
+        user_password = generate_password_hash(payload['password'])
+        user = User(email = payload['email'], password = user_password)
+        db.session.add(user)
+        db.session.commit()
+        return {'status':'Registered Successfully'}
 
 #2. User Login => POST
 @user_blueprint.route('/login', methods = ['POST'])
